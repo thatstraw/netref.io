@@ -17,7 +17,10 @@ import {
   SiJunipernetworks,
 } from "react-icons/si";
 
+import Footer from "@/components/Footer";
+
 const vendorIcons: Record<string, ComponentType<{ className?: string }> | null> = {
+  // ... (omitting lines for brevity, focus on the range)
   cisco: SiCisco,
   juniper: SiJunipernetworks,
   fortinet: SiFortinet,
@@ -146,14 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} NetRef. Built for network engineers.</p>
-          <div className="mt-2 flex items-center justify-center gap-3">
-            <Link href="/browse" className="hover:underline">Browse</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

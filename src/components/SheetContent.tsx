@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Radiation,
   AlertTriangle,
+  Quote,
   ArrowLeft,
   Share2,
   Clock,
@@ -18,10 +19,15 @@ import {
   List
 } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
+import Footer from "@/components/Footer";
+import SheetCard from "@/components/SheetCard";
+import { CHEATS } from "@/lib/cheats";
 
 const AdmonitionContext = React.createContext(false);
 
 export type SheetContentProps = {
+  slug: string;
+  vendorKey: string;
   title: string;
   description?: string;
   vendor?: { name: string; color: string; accent: string } | null;
@@ -30,6 +36,8 @@ export type SheetContentProps = {
 };
 
 export const SheetContent: React.FC<SheetContentProps> = ({
+  slug,
+  vendorKey,
   title,
   description,
   vendor,
@@ -69,6 +77,12 @@ export const SheetContent: React.FC<SheetContentProps> = ({
     }
     return hs;
   }, [content]);
+
+  const relatedCheats = useMemo(() => {
+    return CHEATS.filter(
+      (c) => c.vendor === vendorKey && c.slug !== slug
+    ).slice(0, 3);
+  }, [vendorKey, slug]);
 
   useEffect(() => {
     if (!headings.length) return;
@@ -389,8 +403,11 @@ export const SheetContent: React.FC<SheetContentProps> = ({
 
                     if (firstIdx === -1) {
                       return (
-                        <blockquote className="my-6 border-l-4 border-primary/20 bg-muted/10 p-5 italic text-foreground/80 rounded-r-xl" {...props}>
-                          {children}
+                        <blockquote className="my-8 relative rounded-2xl border border-primary/10 bg-muted/5 p-6 sm:p-10" {...props}>
+                          <Quote className="absolute top-6 left-6 size-10 text-primary/10 fill-primary/5" />
+                          <div className="relative z-10 pl-10 italic text-foreground/80 leading-relaxed">
+                            {children}
+                          </div>
                         </blockquote>
                       );
                     }
@@ -398,8 +415,11 @@ export const SheetContent: React.FC<SheetContentProps> = ({
                     const m = markerLead.exec(firstText);
                     if (!m) {
                       return (
-                        <blockquote className="my-6 border-l-4 border-primary/20 bg-muted/10 p-5 italic text-foreground/80 rounded-r-xl" {...props}>
-                          {children}
+                        <blockquote className="my-8 relative rounded-2xl border border-primary/10 bg-muted/5 p-6 sm:p-10" {...props}>
+                          <Quote className="absolute top-6 left-6 size-10 text-primary/10 fill-primary/5" />
+                          <div className="relative z-10 pl-10 italic text-foreground/80 leading-relaxed">
+                            {children}
+                          </div>
                         </blockquote>
                       );
                     }
@@ -465,18 +485,30 @@ export const SheetContent: React.FC<SheetContentProps> = ({
         </div>
       </div>
 
-      {/* Modern Footer */}
-      <footer className="border-t bg-card py-12">
-        <div className="mx-auto max-w-6xl px-4 text-center">
-          <p className="text-sm font-medium text-muted-foreground">
-            © {new Date().getFullYear()} NetRef.io • Built for the Networking Community
-          </p>
-          <div className="mt-4 flex items-center justify-center gap-6">
-            <Link href="/" className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">Home</Link>
-            <Link href="/browse" className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">Browse</Link>
+      {/* Related Content */}
+      {relatedCheats.length > 0 && (
+        <section className="mx-auto mt-20 max-w-6xl px-4 border-t pt-16">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-3xl font-bold tracking-tight">
+              More {vendor?.name} Cheat Sheets
+            </h2>
+            <Link
+              href={`/browse?vendor=${vendorKey}`}
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              View all {vendor?.name} guides
+            </Link>
           </div>
-        </div>
-      </footer>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {relatedCheats.map((sheet) => (
+              <SheetCard key={sheet.id} sheet={sheet} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Footer at the end of content */}
+      <Footer />
     </div>
   );
 };
