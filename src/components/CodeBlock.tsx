@@ -3,53 +3,75 @@
 import React from "react";
 import { Highlight, themes } from "prism-react-renderer";
 import type { Language } from "prism-react-renderer";
-import { Copy } from "lucide-react";
+import { Check, Clipboard } from "lucide-react";
 
 export function CodeBlock({
   code,
   language = "bash",
+  noMargin = false,
 }: {
   code: string;
   language?: Language | "text";
+  noMargin?: boolean;
 }) {
   const [copied, setCopied] = React.useState(false);
-  const [theme, setTheme] = React.useState(themes.duotoneLight);
+  const [theme, setTheme] = React.useState(themes.vsLight);
 
   React.useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? themes.nightOwl : themes.duotoneLight);
+    setTheme(isDark ? themes.nightOwl : themes.vsLight);
   }, []);
 
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
+      setTimeout(() => setCopied(false), 2000);
+    } catch { }
   };
 
   return (
-    <div className="relative group w-full overflow-hidden rounded-lg border">
-      <button
-        onClick={onCopy}
-        className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md border bg-background/80 px-2 py-1 text-xs hover:bg-muted"
-        aria-label="Copy code"
-      >
-        <Copy className="h-3.5 w-3.5" /> {copied ? "Copied" : "Copy"}
-      </button>
-      <Highlight theme={theme} code={code} language={(language as any) || "bash"}>
-        {({ className, style, tokens, getLineProps, getTokenProps }) => (
-          <pre className={`${className} m-0 p-4 text-sm overflow-auto`} style={style}>
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line, key: i })}>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token, key })} />
-                ))}
-              </div>
-            ))}
-          </pre>
-        )}
-      </Highlight>
+    <div className={`${noMargin ? "" : "my-6"} w-full overflow-hidden rounded-xl border bg-card shadow-sm`}>
+      <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2">
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {language}
+          </span>
+        </div>
+        <button
+          onClick={onCopy}
+          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Copy code"
+        >
+          {copied ? (
+            <>
+              <Check className="h-3.5 w-3.5 text-emerald-500" />
+              <span className="text-emerald-500 font-semibold">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Clipboard className="h-3.5 w-3.5" />
+              <span>Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+      <div className="relative group">
+        <Highlight theme={theme} code={code.trim()} language={(language as any) || "bash"}>
+          {({ className, style, tokens, getLineProps, getTokenProps }) => (
+            <pre className={`${className} m-0 p-4 text-sm overflow-auto leading-relaxed`} style={style}>
+              {tokens.map((line, i) => (
+                <div key={i} {...getLineProps({ line, key: i })}>
+                  {line.map((token, key) => (
+                    <span key={key} {...getTokenProps({ token, key })} />
+                  ))}
+                </div>
+              ))}
+            </pre>
+          )}
+        </Highlight>
+      </div>
     </div>
   );
 }

@@ -56,7 +56,6 @@ export default function NavBar() {
                 )}
               </div>
               <NavLink href="/browse">Browse</NavLink>
-              <NavLink href="/submit">Submit</NavLink>
               <a
                 href="https://github.com/"
                 target="_blank"
@@ -68,9 +67,7 @@ export default function NavBar() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted inline-flex items-center gap-2">
-              <LogIn className="h-4 w-4" /> Sign in
-            </button>
+            {/* Sign in removed */}
           </div>
         </div>
       </div>
@@ -99,8 +96,8 @@ export default function NavBar() {
             <Link href="/browse" className="rounded-md px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
               Browse
             </Link>
-            <Link href="/submit" className="rounded-md px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
-              Submit
+            <Link href="/browse" className="rounded-md px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
+              Browse
             </Link>
           </div>
         </div>

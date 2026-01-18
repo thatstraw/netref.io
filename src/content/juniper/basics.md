@@ -146,10 +146,9 @@ show chassis environment  # Show temperature, fans, power supply
 show chassis alarms       # Display alarms and warnings
 ```
 
-### Tip
 
-```
-# From configuration mode, you don’t need to exit to run operational commands.
-# Just prefix them with 'run':
-
-run show interfaces terse
+> [!TIP] From configuration mode, you don’t need to exit to run operational commands. Just prefix them with 'run': 
+>
+> ```bash
+> run show interfaces terse
+> ```

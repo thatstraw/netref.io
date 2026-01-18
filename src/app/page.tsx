@@ -77,9 +77,6 @@ export default function HomePage() {
             <Link href="/browse" className="rounded-md border bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
               Browse All References
             </Link>
-            <Link href="/submit" className="rounded-md border px-5 py-2 text-sm font-medium hover:bg-muted">
-              Contribute a Reference
-            </Link>
           </div>
         </div>
       </section>
@@ -154,8 +151,6 @@ export default function HomePage() {
           <p>© {new Date().getFullYear()} NetRef. Built for network engineers.</p>
           <div className="mt-2 flex items-center justify-center gap-3">
             <Link href="/browse" className="hover:underline">Browse</Link>
-            <span>•</span>
-            <Link href="/submit" className="hover:underline">Submit</Link>
           </div>
         </div>
       </footer>
