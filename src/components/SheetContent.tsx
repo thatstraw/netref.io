@@ -341,6 +341,40 @@ export const SheetContent: React.FC<SheetContentProps> = ({
                     <ol className="list-decimal pl-6 my-5 space-y-2 text-muted-foreground/90" {...props}>{children}</ol>
                   ),
                   hr: ({ node, ...props }) => <hr className="my-10 border-muted/50" {...props} />,
+                  table: ({ node, children, ...props }) => (
+                    <div className="my-10 overflow-hidden rounded-xl border border-muted/50 bg-card/30 shadow-sm backdrop-blur-[2px]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-[14px] leading-relaxed border-collapse" {...props}>
+                          {children}
+                        </table>
+                      </div>
+                    </div>
+                  ),
+                  thead: ({ node, children, ...props }) => (
+                    <thead className="bg-muted/40 border-b border-muted/50 text-foreground font-bold" {...props}>
+                      {children}
+                    </thead>
+                  ),
+                  tbody: ({ node, children, ...props }) => (
+                    <tbody className="divide-y divide-muted/30" {...props}>
+                      {children}
+                    </tbody>
+                  ),
+                  tr: ({ node, children, ...props }) => (
+                    <tr className="transition-colors hover:bg-muted/10 group/row" {...props}>
+                      {children}
+                    </tr>
+                  ),
+                  th: ({ node, children, ...props }) => (
+                    <th className="px-6 py-4 font-bold border-x first:border-l-0 last:border-r-0 border-muted/30" {...props}>
+                      {children}
+                    </th>
+                  ),
+                  td: ({ node, children, ...props }) => (
+                    <td className="px-6 py-4 text-muted-foreground/90 border-x first:border-l-0 last:border-r-0 border-muted/30 group-hover/row:text-foreground transition-colors" {...props}>
+                      {children}
+                    </td>
+                  ),
                   code: ({ node, className, children, ...props }) => {
                     const inAdmonition = React.useContext(AdmonitionContext);
                     const txt = String(children ?? "").trim();
