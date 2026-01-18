@@ -4,6 +4,7 @@ import React from "react";
 import { Highlight, themes } from "prism-react-renderer";
 import type { Language } from "prism-react-renderer";
 import { Check, Clipboard } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export function CodeBlock({
   code,
@@ -15,12 +16,9 @@ export function CodeBlock({
   noMargin?: boolean;
 }) {
   const [copied, setCopied] = React.useState(false);
-  const [theme, setTheme] = React.useState(themes.vsLight);
+  const { resolvedTheme } = useTheme();
 
-  React.useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? themes.nightOwl : themes.vsLight);
-  }, []);
+  const theme = resolvedTheme === "dark" ? themes.nightOwl : themes.vsLight;
 
   const onCopy = async () => {
     try {
@@ -41,20 +39,15 @@ export function CodeBlock({
         </div>
         <button
           onClick={onCopy}
-          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex h-8 w-16 items-center justify-center gap-1.5 rounded-md text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Copy code"
         >
           {copied ? (
-            <>
-              <Check className="h-3.5 w-3.5 text-emerald-500" />
-              <span className="text-emerald-500 font-semibold">Copied!</span>
-            </>
+            <Check className="h-3.5 w-3.5 text-emerald-500" />
           ) : (
-            <>
-              <Clipboard className="h-3.5 w-3.5" />
-              <span>Copy</span>
-            </>
+            <Clipboard className="h-3.5 w-3.5" />
           )}
+          <span className={copied ? "text-emerald-500" : ""}>{copied ? "Copied" : "Copy"}</span>
         </button>
       </div>
       <div className="relative group">

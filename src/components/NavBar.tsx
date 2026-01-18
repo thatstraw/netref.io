@@ -6,6 +6,8 @@ import { Menu, ChevronDown, LogIn, Github } from "lucide-react";
 import React from "react";
 import { VENDORS } from "@/lib/cheats";
 
+import { ThemeToggle } from "@/components/ThemeToggle";
+
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);
   const [vendorOpen, setVendorOpen] = React.useState(false);
@@ -22,7 +24,7 @@ export default function NavBar() {
   );
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-3">
@@ -30,7 +32,7 @@ export default function NavBar() {
               <Menu className="h-5 w-5" />
             </button>
             <Link href="/" className="font-bold">
-              NetSheets
+              NetRef
             </Link>
             <div className="hidden md:flex items-center">
               <div className="relative">
@@ -67,7 +69,7 @@ export default function NavBar() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Sign in removed */}
+            <ThemeToggle />
           </div>
         </div>
       </div>
