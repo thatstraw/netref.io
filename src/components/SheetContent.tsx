@@ -21,7 +21,7 @@ import {
 import { CodeBlock } from "@/components/CodeBlock";
 import Footer from "@/components/Footer";
 import SheetCard from "@/components/SheetCard";
-import { CHEATS } from "@/lib/cheats";
+import type { ContentIndexItem } from "@/lib/content";
 
 const AdmonitionContext = React.createContext(false);
 
@@ -33,6 +33,7 @@ export type SheetContentProps = {
   vendor?: { name: string; color: string; accent: string } | null;
   tags?: string[];
   content: string; // markdown
+  related?: ContentIndexItem[];
 };
 
 export const SheetContent: React.FC<SheetContentProps> = ({
@@ -43,6 +44,7 @@ export const SheetContent: React.FC<SheetContentProps> = ({
   vendor,
   tags = [],
   content,
+  related = [],
 }) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -78,11 +80,7 @@ export const SheetContent: React.FC<SheetContentProps> = ({
     return hs;
   }, [content]);
 
-  const relatedCheats = useMemo(() => {
-    return CHEATS.filter(
-      (c) => c.vendor === vendorKey && c.slug !== slug
-    ).slice(0, 3);
-  }, [vendorKey, slug]);
+  const relatedCheats = related;
 
   useEffect(() => {
     if (!headings.length) return;
@@ -535,7 +533,7 @@ export const SheetContent: React.FC<SheetContentProps> = ({
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {relatedCheats.map((sheet) => (
-              <SheetCard key={sheet.id} sheet={sheet} />
+              <SheetCard key={sheet.slug} sheet={sheet} />
             ))}
           </div>
         </section>

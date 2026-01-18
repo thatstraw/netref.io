@@ -5,6 +5,7 @@ import { promises as fs } from "fs";
 import matter from "gray-matter";
 import { notFound } from "next/navigation";
 import { getVendorByKey, findCheatBySlug } from "@/lib/cheats";
+import { getRelatedContent } from "@/lib/content";
 import SheetContent from "@/components/SheetContent";
 
 export default async function SheetViewerPage({
@@ -15,6 +16,7 @@ export default async function SheetViewerPage({
   const p = await params;
   const slug = Array.isArray(p.slug) ? p.slug[0] : (p.slug as string);
   const vendorKey = slug.split("-")[0];
+  const related = await getRelatedContent(slug, vendorKey);
 
   // Try to read Markdown from src/content/{vendor}/{name}.md
   const tryReadMarkdown = async () => {
@@ -83,6 +85,7 @@ export default async function SheetViewerPage({
         vendor={md.vendor ? { name: md.vendor.name, color: md.vendor.color, accent: md.vendor.accent } : null}
         tags={md.tags}
         content={md.content}
+        related={related}
       />
     );
   }
@@ -101,6 +104,7 @@ export default async function SheetViewerPage({
       vendor={vendor ? { name: vendor.name, color: vendor.color, accent: vendor.accent } : null}
       tags={sheet.tags}
       content={sheet.content}
+      related={related}
     />
   );
 }

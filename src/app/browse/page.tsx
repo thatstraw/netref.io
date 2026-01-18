@@ -1,52 +1,7 @@
-import path from "path";
-import { promises as fs } from "fs";
-import matter from "gray-matter";
 import Link from "next/link";
 import SheetCard from "@/components/SheetCard";
 import { VENDORS, type VendorKey } from "@/lib/cheats";
-
-async function readContentIndex() {
-  const root = process.cwd();
-  const contentDir = path.join(root, "src", "content");
-  const items: Array<{
-    slug: string;
-    title: string;
-    vendor: VendorKey;
-    description: string;
-    tags: string[];
-    modified: number;
-  }> = [];
-
-  for (const v of VENDORS) {
-    const vendorDir = path.join(contentDir, v.key);
-    try {
-      const entries = await fs.readdir(vendorDir, { withFileTypes: true });
-      for (const entry of entries) {
-        if (!entry.isFile()) continue;
-        if (!/\.(md|mdx)$/i.test(entry.name)) continue;
-        const filePath = path.join(vendorDir, entry.name);
-        try {
-          const raw = await fs.readFile(filePath, "utf8");
-          const { data } = matter(raw);
-          const feature = String(data.feature || path.basename(entry.name, path.extname(entry.name)));
-          const title = String(data.title || `${v.name} ${feature}`);
-          const description = String(data.description || "");
-          const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
-          const vendor = v.key as VendorKey;
-          const slug = `${vendor}-${feature}`;
-          const stat = await fs.stat(filePath);
-          items.push({ slug, title, vendor, description, tags, modified: stat.mtimeMs });
-        } catch {
-          // skip bad file
-        }
-      }
-    } catch {
-      // vendor directory may not exist yet
-    }
-  }
-
-  return items;
-}
+import { getAllContentIndex } from "@/lib/content";
 
 export default async function BrowsePage({
   searchParams,
@@ -57,7 +12,7 @@ export default async function BrowsePage({
   const q = (params?.q || "").toLowerCase().trim();
   const vendorFilter = (params?.vendor as VendorKey | undefined) || undefined;
 
-  const all = await readContentIndex();
+  const all = await getAllContentIndex();
 
   const results = all
     .filter((c) => {
