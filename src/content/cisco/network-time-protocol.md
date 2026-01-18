@@ -11,10 +11,6 @@ description: Quick reference for Network Time Protocol (NTP).
 related: ["/cisco/snmp", "/cisco/syslog"]
 ---
 
-
-
-
-
 # Network Time Protocol (NTP)
 
 NTP ensures accurate logging and synchronization across network devices using UDP port 123.
@@ -23,7 +19,7 @@ NTP ensures accurate logging and synchronization across network devices using UD
 
 ### View Current Time
 Displays the software clock and its time source.
-```bash
+```cisco
 Router# show clock detail
 ```
 > [!NOTE]  
@@ -31,7 +27,7 @@ Router# show clock detail
 
 ### View Device Logs
 Accurate time is critical for the timestamps in these logs.
-```bash
+```cisco
 Router# show logging
 ```
 
@@ -41,19 +37,19 @@ Router# show logging
 
 ### Set Software Clock
 Manually set the system time (not recommended as it will drift).
-```bash
+```cisco
 Router# clock set 14:30:00 18 Jan 2024
 ```
 
 ### Set Hardware Calendar
 Updates the built-in hardware clock.
-```bash
+```cisco
 Router# calendar set 14:30:00 18 Jan 2024
 ```
 
 ### Sync Clock and Calendar
 Synchronizes the two internal time sources.
-```bash
+```cisco
 # Update hardware calendar from software clock
 Router# clock update-calendar
 
@@ -67,13 +63,13 @@ Router# clock read-calendar
 
 ### Configure Time Zone
 Sets the offset from UTC.
-```bash
+```cisco
 Router(config)# clock timezone JST 9
 ```
 
 ### Configure Daylight Savings
 Sets automatic summer time adjustments.
-```bash
+```cisco
 Router(config)# clock summer-time EDT recurring
 ```
 
@@ -83,13 +79,13 @@ Router(config)# clock summer-time EDT recurring
 
 ### Add NTP Server
 Directs the client to sync with a specific remote server.
-```bash
+```cisco
 Router(config)# ntp server 10.1.1.1 prefer
 ```
 
 ### Verify NTP Status
 Check synchronization status and stratum levels.
-```bash
+```cisco
 # Check reachability and stratum of servers
 Router# show ntp associations
 
@@ -99,13 +95,13 @@ Router# show ntp status
 
 > [!TIP]  
 > By default, NTP only updates the software clock. Use this command to keep the hardware calendar in sync automatically:
-> ```bash
+> ```cisco
 > Router(config)# ntp update-calendar
 > ```
 
 ### Set NTP Source
 Forces the device to use a specific interface (like Loopback0) for all NTP traffic.
-```bash
+```cisco
 Router(config)# ntp source loopback0
 ```
 
@@ -115,67 +111,64 @@ Router(config)# ntp source loopback0
 
 ### NTP Master (Server Mode)
 Configures the device to act as an NTP server even if it isn't synced to a higher stratum source.
-```bash
+```cisco
 # Default stratum is 8 if not specified
 Router(config)# ntp master 8
 ```
 
 ### NTP Peering (Symmetric Active)
 Allows two devices at the same stratum to synchronize with each other.
-Configuring ymetric active mode between R2 and R3
 
-```bash
-R2(config)# ntp peer  <R3 IP Address>
-R3(config)# ntp peer  <R2 IP Address>
+```cisco
+# R2 configuration
+R2(config)# ntp peer <R3 IP Address>
+
+# R3 configuration
+R3(config)# ntp peer <R2 IP Address>
 ```
 
 ---
 
 ## NTP Authentication
 
-- NTP authentication can be configured, aulthough it is optional
-- It allows NTP clients to ensure they only sync to the intended servers
-- To configure NTP authentication:
+- NTP authentication ensures clients only sync to intended servers.
+- It is optional but recommended for security.
 
-```
+### Configure Authentication Keys
+```cisco
 Router(config)# ntp authenticate
 
-# create the NTP authentication key(s)
-Router(config)# ntp authentication-key <key-number> md5 <key/password-itself>
+# Create the NTP authentication key(s)
+Router(config)# ntp authentication-key 1 md5 ciscolabs
 
-# specify the trusted key(s)
-Router(config)# ntp trusted-key <key-number>
+# Specify the trusted key(s)
+Router(config)# ntp trusted-key 1
 
-# specify which key to use for each server
-Router(config)# ntp server <ip-address> key <key-number>
-# The above command isn't need on the server itself (R1) .
+# Specify which key to use for each server
+Router(config)# ntp server 10.1.1.1 key 1
 ```
 
-### Enable Secure Sync
-Optional. Ensures the client only syncs with authorized servers.
+### Full Multi-Device Example
+Ensuring R1 (Server), R2, and R3 (Clients/Peers) are all securely synced.
 
-```bash
-
-# server configuration
+```cisco
+# R1 (NTP Master/Server)
 R1(config)# ntp authenticate
 R1(config)# ntp authentication-key 1 md5 ciscolabs
 R1(config)# ntp trusted-key 1
+R1(config)# ntp master 8
 
-# client configuration
+# R2 (Client & Peer)
 R2(config)# ntp authenticate
 R2(config)# ntp authentication-key 1 md5 ciscolabs
 R2(config)# ntp trusted-key 1
 R2(config)# ntp server <R1 IP Address> key 1
+R2(config)# ntp peer <R3 IP Address> key 1
 
-# peer configuration
-R2(config)# ntp peer <R3 IP address> key 1
-
-# client configuration
+# R3 (Client & Peer)
 R3(config)# ntp authenticate
 R3(config)# ntp authentication-key 1 md5 ciscolabs
 R3(config)# ntp trusted-key 1
 R3(config)# ntp server <R1 IP Address> key 1
-
-# peer configuration
-R3(config)# ntp peer <R2 IP address> key 1
+R3(config)# ntp peer <R2 IP Address> key 1
 ```

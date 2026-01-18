@@ -1,161 +1,159 @@
 ---
 title: "Juniper Basics"
 vendor: "juniper"
-description: "From boot to CLI modes with essential show commands."
+feature: "basics"
+category: "basics"
 tags: ["juniper", "basics", "junos", "cli"]
+tested_on: ["Junos OS 21.x", "vSRX", "vEX"]
+last_verified: 2026-01-18
+difficulty: beginner
+description: "From boot to CLI modes with essential show commands."
 ---
 
-When booting up a Juniper virtual device like vEX or vSRX, you are first presented with a FreeBSD shell environment. Junos runs on top of FreeBSD, and the device boots into this lower-level shell before launching the Junos CLI.
+# Juniper JunOS Basics
+
+Junos OS runs on top of FreeBSD. You must transition from the Unix shell to the Junos CLI to manage the device.
+
+## Accessing the CLI
 
 ### Default Login
-
-```
-# At the login prompt, use the following credentials:
-# Username: root
-# Password: (none — just press Enter)
-
-FreeBSD/amd64 (Amnesiac)
+Log in to the FreeBSD shell using default credentials.
+```bash
 login: root
-root@:~ #
-
-# At this point, you are in the Unix shell, not the Junos CLI.
+Password: (none)
 ```
 
-### Entering the Junos CLI
-
-```
-# Type 'cli' to access the Junos CLI.
-
-cli
-
-# This brings you to operational mode, indicated by the > prompt:
+### Enter Junos CLI
+Transition from the shell (`#`) to Junos operational mode (`>`).
+```bash
+root@:~ # cli
 root>
 ```
 
-### Junos CLI Modes
+---
 
-There are two main modes in the Junos CLI.
+## Junos CLI Modes
 
 ### 1. Operational Mode (`>`)
+Used for monitoring, troubleshooting, and viewing status.
+```juniper
+# View interface summary
+root> show interfaces terse
 
-```
-# This mode is used for monitoring and controlling the device 
-# without changing its configuration.
+# Test connectivity
+root> ping 8.8.8.8
 
-show interfaces terse     # Quick summary of all interfaces
-ping 8.8.8.8              # Test connectivity
-request system reboot     # Reboot the device
-
-# To enter configuration mode:
-edit
+# Enter configuration mode
+root> edit
 ```
 
 ### 2. Configuration Mode (`#`)
-
-```
-# This mode allows you to modify the system configuration.
-
+Used for modifying the candidate configuration. Changes must be committed.
+```juniper
 [edit]
-root# set system host-name router1   # Set device hostname
-[edit]
-root# commit                         # Save changes
-[edit]
-root# exit                           # Exit configuration mode
+root# set system host-name router1
 
-# To exit the CLI entirely and return to the FreeBSD shell:
-start shell
+# Save changes to active configuration
+root# commit
+
+# Exit to operational mode
+root# exit
 ```
 
-### Important: Setting the Root Password
+> [!TIP]
+> You can run operational commands from within configuration mode by prefixing them with `run`:
+> ```juniper
+> [edit]
+> root# run show interfaces terse
+> ```
 
-```
-# Junos requires a root password before any commit will succeed.
-# Without it, you'll see:
-# Missing mandatory statement: 'root-authentication'
-# error: commit failed
+---
 
+## Essential Initial Setup
+
+### Set Root Password
+Junos requires a root password before any configuration can be committed.
+```juniper
 [edit]
-root# set system root-authentication plain-text-password   # Set root password
-[edit]
-root# commit                                               # Save configuration
+root# set system root-authentication plain-text-password
 ```
 
-### Disabling Auto Image Upgrade Messages
-
-```
-# On lab devices, you may see frequent “Auto Image Upgrade” messages:
-# Auto Image Upgrade: DHCP INET Client Unbound interfaces : fxp0.0
-# To disable this feature:
-
+### Disable Auto Image Upgrade
+Prevents frequent console messages on lab/virtual devices.
+```juniper
 [edit]
-root# delete chassis auto-image-upgrade   # Disable auto image upgrade
-commit                                    # Save the change
+root# delete chassis auto-image-upgrade
+root# commit
 ```
 
 ---
 
-## Basic `show` Commands for Juniper Switches
+## System Monitoring
 
-### 1. Show System Information
+### Check Hardware & Health
+```juniper
+# List hardware components and serial numbers
+root> show chassis hardware
 
-```
-show version                  # Display Junos version, model, uptime
-show system uptime            # Show how long the device has been running
-show system users             # List logged-in users
-show system processes extensive   # Show processes and CPU usage
-```
+# Check fans, power, and temperature
+root> show chassis environment
 
-### 2. Show Interfaces
-
-```
-show interfaces terse                         # Summary of interfaces and IPs
-show interfaces ge-0/0/1                      # Detailed status of one interface
-show interfaces diagnostics optics ge-0/0/1   # Optical levels (fiber ports)
+# View active system alarms
+root> show chassis alarms
 ```
 
-### 3. Show VLAN and Bridging
+### Check Software & Uptime
+```juniper
+# Show Junos version and model
+root> show version
 
-```
-show vlans                          # List configured VLANs
-show ethernet-switching table       # Display MAC address table
-show ethernet-switching interfaces  # VLAN membership and port mode
-```
-
-### 4. Show Spanning Tree Status
-
-```
-show spanning-tree bridge       # STP bridge ID and priority
-show spanning-tree interface    # STP state per interface
-show spanning-tree statistics   # STP counters and stats
+# Show device uptime and last reboot
+root> show system uptime
 ```
 
-### 5. Show Configuration
+---
 
-```
-# Full active configuration
-show configuration   
+## Interface & Network Status
 
-# Interface-specific configuration
-show configuration interfaces   
+### Basic Interface Verification
+```juniper
+# Summary of all interfaces and IP addresses
+root> show interfaces terse
 
- # VLAN configuration
-show configuration vlans 
+# Detailed status and error counters
+root> show interfaces ge-0/0/0
 
- # Protocols (STP, LACP, etc.)
-show configuration protocols   
-```
-
-### 6. Show Chassis and Hardware
-
-```
-show chassis hardware     # List hardware components and serials
-show chassis environment  # Show temperature, fans, power supply
-show chassis alarms       # Display alarms and warnings
+# Optical levels for SFP/fiber ports
+root> show interfaces diagnostics optics ge-0/0/0
 ```
 
+### VLAN & Switching
+```juniper
+# List active VLANs
+root> show vlans
 
-> [!TIP] From configuration mode, you don’t need to exit to run operational commands. Just prefix them with 'run': 
->
-> ```bash
-> run show interfaces terse
-> ```
+# View MAC address table (CAM table)
+root> show ethernet-switching table
+
+# Spanning-tree status summary
+root> show spanning-tree bridge
+```
+
+---
+
+## Viewing Configuration
+
+### View Entire Config
+```juniper
+# Displays the current active configuration
+root> show configuration
+```
+
+### View Specific Sections
+```juniper
+# Show only interface configuration
+root> show configuration interfaces
+
+# Show only protocol (OSPF, BGP) configuration
+root> show configuration protocols
+```

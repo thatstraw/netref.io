@@ -11,67 +11,84 @@ description: Quick reference for enabling, disabling, and verifying Cisco Discov
 related: ["/cisco/lldp", "/cisco/vlan"]
 ---
 
+# Cisco Discovery Protocol (CDP)
 
-### Enable or Disable CDP Globally
+CDP is a proprietary Cisco protocol used to discover directly connected Cisco neighbors.
 
-```bash
-Router(config)# cdp run        # Enable CDP globally (default on Cisco devices)
-Router(config)# no cdp run     # Disable CDP globally
+## Global Configuration
+
+### Enable CDP Globally
+CDP is enabled by default on most Cisco devices.
+```cisco
+Router(config)# cdp run
 ```
 
-### Enable or Disable CDP on an Interface
-
-```bash
-Router(config-if)# cdp enable       # Enable CDP on the interface
-Router(config-if)# no cdp enable    # Disable CDP on the interface
-```
-
-### Verify CDP Neighbors
-
-```bash
-Router# show cdp neighbors
-# Displays directly connected Cisco devices, their interfaces, and capabilities.
-```
-
-### Detailed Information About Neighbors
-
-```bash
-Router# show cdp neighbors detail
-# Includes IP addresses, platform, software version, and more.
-```
-
-### CDP Timer and Holdtime
-
-```bash
-Router(config)# cdp timer 30
-# Sets CDP advertisement interval (default: 60 seconds)
-
-Router(config)# cdp holdtime 120
-# Sets how long (in seconds) to hold neighbor info before discarding (default: 180 seconds)
-```
-
-### CDP Traffic Information
-
-```bash
-Router# show cdp traffic
-# Displays CDP packets sent/received and errors.
-```
-
-### View CDP Information for a Specific Interface
-
-```bash
-Router# show cdp interface GigabitEthernet0/0
-# Displays CDP status, timer, and holdtime settings for a specific interface.
-```
-
-### Disable CDP on All Interfaces (Best Practice on Edge Ports)
-
-```bash
+### Disable CDP Globally
+Recommended for security if network discovery is not needed.
+```cisco
 Router(config)# no cdp run
-# Turns off CDP globally for security on external-facing interfaces.
+```
+
+---
+
+## Interface Configuration
+
+### Enable CDP on Interface
+Must be enabled globally first for this to have an effect.
+```cisco
+Router(config-if)# cdp enable
+```
+
+### Disable CDP on Interface
+Useful for security on external-facing (Untrusted/Internet) ports.
+```cisco
+Router(config-if)# no cdp enable
+```
+
+---
+
+## Verification & Monitoring
+
+### View Summary of Neighbors
+Displays basic info: Device ID, Local Intrfce, Holdtime, Capability, Platform, Port ID.
+```cisco
+Router# show cdp neighbors
+```
+
+### View Detailed Neighbor Info
+Includes IP addresses, IOS version, and duplex settings.
+```cisco
+Router# show cdp neighbors detail
+```
+
+### View CDP Interface Status
+Checks if CDP is running on specific interfaces and shows timers.
+```cisco
+Router# show cdp interface gigabitEthernet 0/1
+```
+
+### View CDP Traffic Stats
+Displays counters for packets sent, received, and errors.
+```cisco
+Router# show cdp traffic
+```
+
+---
+
+## Timers & Tuning
+
+### Set Advertisement Timer
+Frequency (in seconds) that CDP packets are sent out.
+```cisco
+Router(config)# cdp timer 30
+```
+
+### Set Holdtime
+How long a neighbor should keep the info before aging it out.
+```cisco
+Router(config)# cdp holdtime 120
 ```
 
 > [!WARNING]  
 > CDP should usually be disabled on interfaces that face untrusted networks (like the Internet) since it exposes device details that could aid an attacker.  
 > Keep it enabled only on internal/trusted links where network discovery is useful.
-

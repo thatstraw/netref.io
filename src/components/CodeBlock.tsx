@@ -1,10 +1,21 @@
 "use client";
 
 import React from "react";
-import { Highlight, themes } from "prism-react-renderer";
+import { Highlight, themes, Prism } from "prism-react-renderer";
 import type { Language } from "prism-react-renderer";
 import { Check, Clipboard } from "lucide-react";
 import { useTheme } from "next-themes";
+import { ciscoGrammar } from "@/lib/prism-cisco";
+import { juniperGrammar } from "@/lib/prism-juniper";
+import { fortinetGrammar } from "@/lib/prism-fortinet";
+
+// Register custom languages
+if (typeof window !== "undefined") {
+  const L = Prism.languages as any;
+  L.cisco = ciscoGrammar;
+  L.juniper = juniperGrammar;
+  L.fortinet = fortinetGrammar;
+}
 
 export function CodeBlock({
   code,
@@ -12,7 +23,7 @@ export function CodeBlock({
   noMargin = false,
 }: {
   code: string;
-  language?: Language | "text";
+  language?: Language | "text" | "cisco" | "juniper" | "fortinet";
   noMargin?: boolean;
 }) {
   const [copied, setCopied] = React.useState(false);
