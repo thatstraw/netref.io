@@ -78,7 +78,7 @@ export default async function BrowsePage({
       <form method="GET" className="mb-6 flex flex-col gap-3 md:flex-row md:items-center">
         <input
           name="q"
-          defaultValue={searchParams?.q || ""}
+          defaultValue={params?.q || ""}
           placeholder="Search by title, tags, description..."
           className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none"
         />
@@ -91,10 +91,10 @@ export default async function BrowsePage({
             All vendors
           </Link>
           {VENDORS.map((v) => {
-            const params = new URLSearchParams();
-            if (q) params.set("q", q);
-            params.set("vendor", v.key);
-            const href = `/browse?${params.toString()}`;
+            const search = new URLSearchParams();
+            if (q) search.set("q", q);
+            search.set("vendor", v.key);
+            const href = `/browse?${search.toString()}`;
             const active = vendorFilter === v.key;
             return (
               <Link

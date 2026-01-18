@@ -132,10 +132,17 @@ show spanning-tree statistics   # STP counters and stats
 ### 5. Show Configuration
 
 ```
-show configuration              # Full active configuration
-show configuration interfaces   # Interface-specific configuration
-show configuration vlans        # VLAN configuration
-show configuration protocols    # Protocols (STP, LACP, etc.)
+# Full active configuration
+show configuration   
+
+# Interface-specific configuration
+show configuration interfaces   
+
+ # VLAN configuration
+show configuration vlans 
+
+ # Protocols (STP, LACP, etc.)
+show configuration protocols   
 ```
 
 ### 6. Show Chassis and Hardware
